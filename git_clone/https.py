@@ -8,7 +8,7 @@ from git_clone.secrets import setup_environment_variables
 from git_clone.volumes import add_volume
 
 
-def make_https_component(repository_url: str, credentials_secret: str, username_key: str, token_key: str, output_volume: k8s.V1Volume,
+def make_https_component(repository_url: str, credentials_secret: str, username_key: str, token_key: str, output_volume: k8s.V1Volume, output_subdirectory: str = "", 
                          display_name: str = DEFAULT_DISPLAY_NAME,
                          image_name: str = DEFAULT_IMAGE_NAME, image_tag: str = DEFAULT_IMAGE_TAG,
                          memory_request: str = DEFAULT_MEMORY_REQUEST, memory_limit: str = DEFAULT_MEMORY_LIMIT,
@@ -17,6 +17,7 @@ def make_https_component(repository_url: str, credentials_secret: str, username_
 
     base_repository_url = repository_url.split("://", 1)[1]
     clone_url = f"https://$(GIT_USERNAME):$(GIT_TOKEN)@{base_repository_url}"
+    output_path = f"{OUTPUT_DIR}/{output_subdirectory}"
 
     operator = dsl.ContainerOp(
         name=DEFAULT_CONTAINER_NAME,
@@ -25,7 +26,7 @@ def make_https_component(repository_url: str, credentials_secret: str, username_
         arguments=[
             "clone",
             clone_url,
-            OUTPUT_DIR
+            output_path
         ]
     )
 
